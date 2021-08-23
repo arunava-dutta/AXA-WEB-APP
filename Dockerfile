@@ -1,4 +1,4 @@
-FROM axaacr.azurecr.io/tomcat:latest
+FROM tomcat:latest
 
 ENV CATALINA_HOME /usr/local/tomcat
 RUN mkdir -p /app
