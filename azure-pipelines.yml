@@ -1,0 +1,73 @@
+# New CI YAML
+trigger:
+- none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+ contregistry: 'ACRServiceConnection'
+ dockerrepo: 'testrepo'
+ artifactid: 'webappimage-extsec'
+
+stages:
+# - stage: Build
+#   displayName: Build stage
+
+#   jobs:
+#   - job: BuildArtifactjob
+#     displayName: Build JOB
+
+#     steps:
+
+#     - task: Maven@3
+#       inputs:
+#         mavenPomFile: 'myapp/pom.xml'
+#         goals: 'clean install'
+#         publishJUnitResults: false
+#         javaHomeOption: 'JDKVersion'
+#         mavenVersionOption: 'Default'
+#         mavenAuthenticateFeed: false
+#         effectivePomSkip: false
+#         sonarQubeRunAnalysis: false
+#     # - task: DockerInstaller@0
+#     #   inputs:
+#     #     dockerVersion: '17.09.0-ce'
+#     - task: Docker@2
+#       inputs:
+#         containerRegistry: 'ACRServiceConnection'
+#         command: 'login'
+#     - task: Docker@2
+#       inputs:
+#         containerRegistry: '$(contregistry)'
+#         repository: '$(dockerrepo)/$(artifactid)'
+#         command: 'build'
+#         Dockerfile: '**/Dockerfile'
+#     - task: Docker@2
+#       inputs:
+#         containerRegistry: '$(contregistry)'
+#         repository: '$(dockerrepo)/$(artifactid)'
+#         command: 'push'
+
+- stage: Deploy
+  displayName: Deploy stage
+
+  jobs:
+  - job: DeployArtifactjob
+    displayName: Deploy Job
+  - deployment:
+    displayName: Deploy to AKS
+    pool:
+      vmImage: ubuntu-latest
+    environment: POC-ENV-CLUSTER
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: KubernetesManifest@0
+            inputs:
+              action: 'deploy'
+              kubernetesServiceConnection: 'POC-ENV-CLUSTER-poccluster-pocns-1627362869469'
+              namespace: 'pocns'
+              manifests: '**/deployment.yaml'

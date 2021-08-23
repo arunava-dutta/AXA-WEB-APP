@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app
+        image: axaacr.azurecr.io/testrepo/webappimage-extsec:344
+        ports:
+        - containerPort: 8080
+        env:
+        - name: username
+          valueFrom:
+            secretKeyRef:
+              name: secret-to-be-created
+              key: username
+        - name: password1
+          valueFrom:
+            secretKeyRef:
+              name: secret-to-be-created
+              key: password1
+        - name: constring
+          valueFrom:
+            secretKeyRef:
+              name: secret-to-be-created
+              key: constring            
+
+---        
+apiVersion: v1
+kind: Service
+metadata:
+  name: webappservice
+  namespace: pocns
+spec:
+  selector:
+    app: web-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer      
