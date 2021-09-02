@@ -1,14 +1,27 @@
 package mydomain.myapp.controller;
 
-	public class HelloController {	
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
+
+public class HelloController {	
 		
 		  //String propValue=null;
 		  String propConfigValue=null;
 		  String username="";
 		  String password1="";
 		  String constring="";
+		  String propSecretValue=null;
 		  
-		  public String getPropConfigValue() {
+		  public String getPropSecretValue() {
+			return propSecretValue;
+		}
+
+		public void setPropSecretValue(String propSecretValue) {
+			this.propSecretValue = propSecretValue;
+		}
+
+		public String getPropConfigValue() {
 			return propConfigValue;
 		}
 
@@ -20,16 +33,20 @@ package mydomain.myapp.controller;
 		public HelloController(){
 
 			  
-			  //Properties props = new Properties();
+			  Properties props = new Properties();
 				
-				//InputStream input = null;
+			InputStream input = null;
 				try {
-				
-			
+           input = new FileInputStream(System.getProperty("devConfig.properties"));
+					
+					props.load(input);
+					propConfigValue=props.getProperty("DEV");
+					   //get the property value and print it out
+					 System.out.println(props.getProperty("DEV"));
 	            username=System.getenv("username");
 	            password1=System.getenv("password1");
 	            constring=System.getenv("constring");
-	            propConfigValue=username+""+password1+""+constring;	
+	            propSecretValue=username+""+password1+""+constring;	
 
 					
 					
@@ -43,7 +60,7 @@ package mydomain.myapp.controller;
 		public String sayHello() { 
 			
 			
-			return propConfigValue;
+			return "Secret Value----->"+ propSecretValue + ".....!!!!" + " Properties File----->" + propConfigValue;
 			
 		
 	}
